@@ -1,85 +1,101 @@
-import { Statement } from './components/Statement'
-import { WatchRow } from './components/WatchRow'
-import { Label } from './components/Label'
-import type { Token } from './lib/types'
+import { useState } from 'react'
+import { Lifecycle, type Step } from './components/Lifecycle'
 
-/** Sample watchlist until a live source is wired. */
-const WATCH: Token[] = [
-  { address: '1', symbol: 'Solana', price: 178.42, mcap: 84_000_000_000, volume5m: 0, change5m: 2.1 },
-  { address: '2', symbol: 'Jupiter', price: 0.94, mcap: 1_300_000_000, volume5m: 0, change5m: 5.4 },
-  { address: '3', symbol: 'Jito', price: 3.12, mcap: 420_000_000, volume5m: 0, change5m: -1.8 },
-  { address: '4', symbol: 'Pyth', price: 0.41, mcap: 380_000_000, volume5m: 0, change5m: -0.6 },
-  { address: '5', symbol: 'Drift', price: 0.88, mcap: 190_000_000, volume5m: 0, change5m: 3.3 },
+/** The launch lifecycle. Tools sit at their step; empty steps are quiet
+ *  "coming" states so the whole thing reads as one system with a roadmap. */
+const STEPS: Step[] = [
+  {
+    n: '01',
+    phase: 'Time it',
+    title: 'Market Sentiment',
+    desc: 'Read live market conditions and know whether now is the moment to launch — or whether to wait.',
+    status: 'live',
+    key: 'sentiment',
+  },
+  {
+    n: '02',
+    phase: 'Launch it',
+    title: 'Token deployer',
+    desc: '',
+    status: 'soon',
+  },
+  {
+    n: '03',
+    phase: 'Build the community',
+    title: 'Telegram Group Creator',
+    desc: 'Paste a contract address — get a captcha-gated community group in seconds, and an invite to it.',
+    status: 'live',
+    key: 'telegram',
+  },
+  {
+    n: '04',
+    phase: 'Grow it',
+    title: 'Growth tools',
+    desc: '',
+    status: 'soon',
+  },
 ]
 
-const NAV = ['Home', 'Watch', 'You'] as const
+const TOOL_TITLES: Record<string, string> = {
+  sentiment: 'Market Sentiment',
+  telegram: 'Telegram Group Creator',
+}
 
 export default function App() {
+  const [openTool, setOpenTool] = useState<string | null>(null)
+
+  if (openTool) {
+    return <ToolScreen title={TOOL_TITLES[openTool] ?? 'Tool'} onBack={() => setOpenTool(null)} />
+  }
+
   return (
     <div className="min-h-screen mx-auto max-w-[430px] flex flex-col overflow-x-hidden">
-      {/* Wordmark + statement date — quiet, editorial */}
-      <header className="flex items-baseline justify-between px-6 pt-7 pb-5">
+      <header className="px-6 pt-7 pb-6">
         <h1 className="font-display text-sub text-ink tracking-[-0.01em] flex items-center gap-1.5">
           Poise
           <span className="w-1.5 h-1.5 rounded-full bg-cobalt translate-y-[-2px]" />
         </h1>
-        <span className="font-data tnum text-micro uppercase tracking-[0.14em] text-ink-faint">
-          13 Jul
-        </span>
       </header>
 
-      <main className="flex-1 flex flex-col gap-8 px-6 pb-6">
-        {/* THE STATEMENT — signature hero */}
-        <Statement
-          label="Portfolio — paper"
-          value="$12,480.32"
-          delta={2.4}
-          meta={[
-            { label: 'Day', value: '+$291.40', tone: 'up' },
-            { label: 'Positions', value: '6' },
-            { label: 'Open', value: '+18.2%', tone: 'up' },
-          ]}
-        />
+      <main className="flex-1 flex flex-col px-6 pb-10">
+        {/* What this is — plain language, no fluff */}
+        <div className="mb-9">
+          <h2 className="font-display text-title text-ink leading-[1.15] tracking-[-0.015em]">
+            Everything it takes to launch a memecoin.
+          </h2>
+          <p className="mt-3 text-base text-ink-soft leading-relaxed">
+            The slow, manual parts of a launch — automated. Start at any step.
+          </p>
+        </div>
 
-        {/* Watchlist */}
-        <section>
-          <Label right={
-            <span className="font-data tnum text-micro text-ink-faint uppercase tracking-wider">
-              {WATCH.length}
-            </span>
-          }>
-            Watchlist
-          </Label>
-          <div className="mt-1 divide-y divide-hairline">
-            {WATCH.map((t) => (
-              <WatchRow key={t.address} token={t} />
-            ))}
-          </div>
-        </section>
-
-        {/* Primary action — one ink button, thumb-reachable */}
-        <button className="w-full rounded-lg bg-ink text-paper font-medium text-base py-4 active:opacity-90 transition-opacity">
-          Track a token
-        </button>
+        <Lifecycle steps={STEPS} onOpen={setOpenTool} />
       </main>
+    </div>
+  )
+}
 
-      {/* Minimal nav — three destinations, cobalt marks the active one */}
-      <nav className="sticky bottom-0 bg-paper/90 backdrop-blur border-t border-hairline grid grid-cols-3">
-        {NAV.map((item, i) => {
-          const active = i === 0
-          return (
-            <button
-              key={item}
-              className="py-3.5 flex flex-col items-center gap-1.5 text-fine"
-            >
-              <span className={active ? 'text-ink font-medium' : 'text-ink-faint'}>{item}</span>
-              <span
-                className={`w-1 h-1 rounded-full ${active ? 'bg-cobalt' : 'bg-transparent'}`}
-              />
-            </button>
-          )
-        })}
-      </nav>
+/** Minimal on-brand tool screen. Real tool UIs land here next. */
+function ToolScreen({ title, onBack }: { title: string; onBack: () => void }) {
+  return (
+    <div className="min-h-screen mx-auto max-w-[430px] flex flex-col overflow-x-hidden px-6">
+      <header className="pt-7 pb-6">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-fine text-ink-soft active:text-ink transition-colors"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M19 12H6M12 5l-7 7 7 7" />
+          </svg>
+          Back
+        </button>
+      </header>
+      <div className="flex-1 flex flex-col pt-6">
+        <span className="text-micro uppercase tracking-[0.16em] text-ink-faint">Tool</span>
+        <h1 className="mt-2 font-display text-title text-ink tracking-[-0.015em]">{title}</h1>
+        <p className="mt-3 text-base text-ink-soft leading-relaxed">
+          This tool is being wired up — it opens here next.
+        </p>
+      </div>
     </div>
   )
 }
