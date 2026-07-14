@@ -1,53 +1,62 @@
 @import 'tailwindcss';
 
-/* ── Design tokens ─────────────────────────────────────────────
-   Trading-terminal aesthetic: near-black, lime accent, dense.
-   Tailwind v4 reads these as utilities, e.g. bg-base, text-lime. */
+/* ── Porcelain / Ink / Cobalt ───────────────────────────────────────────────
+   A light, editorial trading tool — a private-bank statement, not a terminal.
+   Type carries the personality; color is rationed. */
 @theme {
-  --color-base: #0a0a0a;        /* near-black page background */
-  --color-panel: #101010;       /* raised surfaces */
-  --color-panel-2: #161616;     /* nested surfaces */
-  --color-line: #1f1f1f;        /* hairline borders */
-  --color-line-2: #2a2a2a;      /* stronger borders */
+  --color-paper: #f4f3ee;        /* warm porcelain page */
+  --color-surface: #ffffff;      /* raised cards */
+  --color-ink: #16151a;          /* text + primary interactive */
+  --color-ink-soft: #74727b;     /* secondary text */
+  --color-ink-faint: #a6a3ab;    /* smallest labels */
+  --color-hairline: #e7e4db;     /* ledger rules / borders */
+  --color-hairline-2: #d9d5ca;   /* stronger rule */
+  --color-cobalt: #2c2fa6;       /* the one signature hue — active + mark */
+  --color-up: #1b6e4b;           /* gain — desaturated pine */
+  --color-down: #b24230;         /* loss — desaturated brick */
 
-  --color-lime: #a3e635;        /* primary accent */
-  --color-lime-dim: #84cc16;    /* accent, pressed/hover */
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-body: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-data: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --color-ink: #ededed;         /* primary text */
-  --color-ink-mute: #a0a0a0;    /* secondary text */
-  --color-ink-faint: #6b6b6b;   /* tertiary / labels */
-
-  --color-up: #a3e635;          /* gains (reuse lime) */
-  --color-down: #f87171;        /* losses */
-
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-
-  --radius-sm: 2px;             /* tool, not SaaS — corners stay tight */
-  --radius: 4px;
+  /* Disciplined type scale */
+  --text-micro: 0.6875rem;   /* 11 — tracked caps labels */
+  --text-fine: 0.8125rem;    /* 13 — secondary */
+  --text-base: 0.9375rem;    /* 15 — body */
+  --text-sub: 1.1875rem;     /* 19 — subhead */
+  --text-title: 1.875rem;    /* 30 — section title */
+  --text-hero: 3.25rem;      /* 52 — the statement */
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    background: var(--color-base);
+    background: var(--color-paper);
+    color-scheme: light;
   }
   body {
     margin: 0;
-    background: var(--color-base);
+    background: var(--color-paper);
     color: var(--color-ink);
-    font-family: var(--font-sans);
-    font-feature-settings: 'tnum' 1;   /* tabular figures */
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    /* respect iOS safe areas — this is a phone tool */
+    text-rendering: optimizeLegibility;
+    /* respect iOS safe areas — this is a one-handed phone tool */
     padding: env(safe-area-inset-top) env(safe-area-inset-right)
              env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
-  .tnum { font-variant-numeric: tabular-nums; }
-  ::selection { background: var(--color-lime); color: #0a0a0a; }
 
-  /* thin, dark scrollbars */
-  * { scrollbar-width: thin; scrollbar-color: var(--color-line-2) transparent; }
+  /* Fraunces optical sizing on for display text */
+  .font-display { font-optical-sizing: auto; }
+
+  /* Numbers are tabular everywhere — figures must align to be trusted */
+  .tnum { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; }
+
+  ::selection { background: var(--color-cobalt); color: #fff; }
+
+  * { scrollbar-width: thin; scrollbar-color: var(--color-hairline-2) transparent; }
   *::-webkit-scrollbar { width: 6px; height: 6px; }
-  *::-webkit-scrollbar-thumb { background: var(--color-line-2); border-radius: 3px; }
+  *::-webkit-scrollbar-thumb { background: var(--color-hairline-2); border-radius: 3px; }
 }

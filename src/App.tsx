@@ -1,95 +1,84 @@
-import { useEffect, useState } from 'react'
-import { Panel } from './components/Panel'
-import { Stat } from './components/Stat'
-import { TokenRow } from './components/TokenRow'
-import { apiGet } from './lib/api'
+import { Statement } from './components/Statement'
+import { WatchRow } from './components/WatchRow'
+import { Label } from './components/Label'
 import type { Token } from './lib/types'
 
-/** Placeholder feed until the real data source is wired.
- *  Replace with `apiGet<Token[]>('tokens')` once the endpoint exists. */
-const SAMPLE: Token[] = [
-  { address: '1', symbol: 'WOLF', price: 0.0000108, mcap: 10768, volume5m: 42000, change5m: 128.4 },
-  { address: '2', symbol: 'BARTS', price: 0.0000257, mcap: 25684, volume5m: 11700, change5m: 34.1 },
-  { address: '3', symbol: 'GHOST', price: 0.0000057, mcap: 5754, volume5m: 8300, change5m: -12.7 },
-  { address: '4', symbol: 'PULSE', price: 0.00034, mcap: 340000, volume5m: 96000, change5m: 52.0 },
-  { address: '5', symbol: 'RUGZ', price: 0.0011, mcap: 120000, volume5m: 4200, change5m: -41.0 },
+/** Sample watchlist until a live source is wired. */
+const WATCH: Token[] = [
+  { address: '1', symbol: 'Solana', price: 178.42, mcap: 84_000_000_000, volume5m: 0, change5m: 2.1 },
+  { address: '2', symbol: 'Jupiter', price: 0.94, mcap: 1_300_000_000, volume5m: 0, change5m: 5.4 },
+  { address: '3', symbol: 'Jito', price: 3.12, mcap: 420_000_000, volume5m: 0, change5m: -1.8 },
+  { address: '4', symbol: 'Pyth', price: 0.41, mcap: 380_000_000, volume5m: 0, change5m: -0.6 },
+  { address: '5', symbol: 'Drift', price: 0.88, mcap: 190_000_000, volume5m: 0, change5m: 3.3 },
 ]
 
+const NAV = ['Home', 'Watch', 'You'] as const
+
 export default function App() {
-  const [health, setHealth] = useState<'…' | 'up' | 'down'>('…')
-
-  useEffect(() => {
-    // Confirms the serverless API + DB wiring end-to-end; harmless if absent.
-    apiGet<{ db: string }>('health')
-      .then((h) => setHealth(h.db === 'up' ? 'up' : 'down'))
-      .catch(() => setHealth('down'))
-  }, [])
-
   return (
-    <div className="min-h-screen mx-auto max-w-[430px] flex flex-col">
-      {/* Terminal header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-line sticky top-0 bg-base/90 backdrop-blur z-10">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-lime rounded-full" />
-          <h1 className="font-mono text-sm tracking-[0.2em] uppercase text-ink">
-            edge<span className="text-lime">/</span>terminal
-          </h1>
-        </div>
-        <span
-          className="text-[10px] font-mono uppercase tracking-wider text-ink-faint"
-          title="serverless API + DB status"
-        >
-          api{' '}
-          <span className={health === 'up' ? 'text-lime' : health === 'down' ? 'text-down' : 'text-ink-faint'}>
-            ●
-          </span>
+    <div className="min-h-screen mx-auto max-w-[430px] flex flex-col overflow-x-hidden">
+      {/* Wordmark + statement date — quiet, editorial */}
+      <header className="flex items-baseline justify-between px-6 pt-7 pb-5">
+        <h1 className="font-display text-sub text-ink tracking-[-0.01em] flex items-center gap-1.5">
+          Poise
+          <span className="w-1.5 h-1.5 rounded-full bg-cobalt translate-y-[-2px]" />
+        </h1>
+        <span className="font-data tnum text-micro uppercase tracking-[0.14em] text-ink-faint">
+          13 Jul
         </span>
       </header>
 
-      <main className="flex-1 flex flex-col gap-3 p-3">
-        {/* Portfolio strip */}
-        <Panel label="portfolio · paper">
-          <div className="grid grid-cols-3 gap-3">
-            <Stat label="equity" value="$1,240" delta={12.4} />
-            <Stat label="24h pnl" value="+$138" delta={11.1} />
-            <Stat label="win rate" value="45%" />
-          </div>
-        </Panel>
+      <main className="flex-1 flex flex-col gap-8 px-6 pb-6">
+        {/* THE STATEMENT — signature hero */}
+        <Statement
+          label="Portfolio — paper"
+          value="$12,480.32"
+          delta={2.4}
+          meta={[
+            { label: 'Day', value: '+$291.40', tone: 'up' },
+            { label: 'Positions', value: '6' },
+            { label: 'Open', value: '+18.2%', tone: 'up' },
+          ]}
+        />
 
-        {/* Live feed */}
-        <Panel
-          label="live feed · solana"
-          right={
-            <span className="text-[10px] font-mono text-lime uppercase tracking-wider">
-              {SAMPLE.length} live
+        {/* Watchlist */}
+        <section>
+          <Label right={
+            <span className="font-data tnum text-micro text-ink-faint uppercase tracking-wider">
+              {WATCH.length}
             </span>
-          }
-          className="overflow-hidden"
-        >
-          <div className="-mx-3 -my-3">
-            {SAMPLE.map((t) => (
-              <TokenRow key={t.address} token={t} />
+          }>
+            Watchlist
+          </Label>
+          <div className="mt-1 divide-y divide-hairline">
+            {WATCH.map((t) => (
+              <WatchRow key={t.address} token={t} />
             ))}
           </div>
-        </Panel>
+        </section>
 
-        <p className="text-center text-[10px] font-mono text-ink-faint tracking-wider uppercase pt-2">
-          scaffold ready · wire real data in src/lib + /api
-        </p>
+        {/* Primary action — one ink button, thumb-reachable */}
+        <button className="w-full rounded-lg bg-ink text-paper font-medium text-base py-4 active:opacity-90 transition-opacity">
+          Track a token
+        </button>
       </main>
 
-      {/* Bottom nav — thumb-reachable, the way a phone tool should be */}
-      <nav className="sticky bottom-0 grid grid-cols-4 border-t border-line bg-base/95 backdrop-blur">
-        {['feed', 'scan', 'trades', 'more'].map((tab, i) => (
-          <button
-            key={tab}
-            className={`py-3 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-              i === 0 ? 'text-lime' : 'text-ink-faint active:text-ink'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+      {/* Minimal nav — three destinations, cobalt marks the active one */}
+      <nav className="sticky bottom-0 bg-paper/90 backdrop-blur border-t border-hairline grid grid-cols-3">
+        {NAV.map((item, i) => {
+          const active = i === 0
+          return (
+            <button
+              key={item}
+              className="py-3.5 flex flex-col items-center gap-1.5 text-fine"
+            >
+              <span className={active ? 'text-ink font-medium' : 'text-ink-faint'}>{item}</span>
+              <span
+                className={`w-1 h-1 rounded-full ${active ? 'bg-cobalt' : 'bg-transparent'}`}
+              />
+            </button>
+          )
+        })}
       </nav>
     </div>
   )
