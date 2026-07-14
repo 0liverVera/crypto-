@@ -12,7 +12,8 @@
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "telegram": "^2.26.22"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.2",
