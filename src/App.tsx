@@ -2,11 +2,8 @@ import { useEffect, useState } from 'react'
 import { Panel } from './components/Panel'
 import { Stat } from './components/Stat'
 import { TokenRow } from './components/TokenRow'
-import CandleTgTool from './components/candle-tg/CandleTgTool'
 import { apiGet } from './lib/api'
 import type { Token } from './lib/types'
-
-type View = 'feed' | 'build'
 
 /** Placeholder feed until the real data source is wired.
  *  Replace with `apiGet<Token[]>('tokens')` once the endpoint exists. */
@@ -20,7 +17,6 @@ const SAMPLE: Token[] = [
 
 export default function App() {
   const [health, setHealth] = useState<'…' | 'up' | 'down'>('…')
-  const [view, setView] = useState<View>('feed')
 
   useEffect(() => {
     // Confirms the serverless API + DB wiring end-to-end; harmless if absent.
@@ -51,61 +47,49 @@ export default function App() {
       </header>
 
       <main className="flex-1 flex flex-col gap-3 p-3">
-        {view === 'feed' && (
-          <>
-            {/* Portfolio strip */}
-            <Panel label="portfolio · paper">
-              <div className="grid grid-cols-3 gap-3">
-                <Stat label="equity" value="$1,240" delta={12.4} />
-                <Stat label="24h pnl" value="+$138" delta={11.1} />
-                <Stat label="win rate" value="45%" />
-              </div>
-            </Panel>
+        {/* Portfolio strip */}
+        <Panel label="portfolio · paper">
+          <div className="grid grid-cols-3 gap-3">
+            <Stat label="equity" value="$1,240" delta={12.4} />
+            <Stat label="24h pnl" value="+$138" delta={11.1} />
+            <Stat label="win rate" value="45%" />
+          </div>
+        </Panel>
 
-            {/* Live feed */}
-            <Panel
-              label="live feed · solana"
-              right={
-                <span className="text-[10px] font-mono text-lime uppercase tracking-wider">
-                  {SAMPLE.length} live
-                </span>
-              }
-              className="overflow-hidden"
-            >
-              <div className="-mx-3 -my-3">
-                {SAMPLE.map((t) => (
-                  <TokenRow key={t.address} token={t} />
-                ))}
-              </div>
-            </Panel>
-          </>
-        )}
+        {/* Live feed */}
+        <Panel
+          label="live feed · solana"
+          right={
+            <span className="text-[10px] font-mono text-lime uppercase tracking-wider">
+              {SAMPLE.length} live
+            </span>
+          }
+          className="overflow-hidden"
+        >
+          <div className="-mx-3 -my-3">
+            {SAMPLE.map((t) => (
+              <TokenRow key={t.address} token={t} />
+            ))}
+          </div>
+        </Panel>
 
-        {view === 'build' && <CandleTgTool />}
+        <p className="text-center text-[10px] font-mono text-ink-faint tracking-wider uppercase pt-2">
+          scaffold ready · wire real data in src/lib + /api
+        </p>
       </main>
 
       {/* Bottom nav — thumb-reachable, the way a phone tool should be */}
       <nav className="sticky bottom-0 grid grid-cols-4 border-t border-line bg-base/95 backdrop-blur">
-        {([
-          ['feed', 'feed'],
-          ['build', 'build'],
-          ['scan', null],
-          ['more', null],
-        ] as const).map(([tab, target]) => {
-          const active = target === view
-          return (
-            <button
-              key={tab}
-              onClick={() => target && setView(target)}
-              disabled={!target}
-              className={`py-3 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-                active ? 'text-lime' : 'text-ink-faint active:text-ink disabled:opacity-40'
-              }`}
-            >
-              {tab}
-            </button>
-          )
-        })}
+        {['feed', 'scan', 'trades', 'more'].map((tab, i) => (
+          <button
+            key={tab}
+            className={`py-3 text-[11px] font-mono uppercase tracking-wider transition-colors ${
+              i === 0 ? 'text-lime' : 'text-ink-faint active:text-ink'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </nav>
     </div>
   )
